@@ -54,28 +54,25 @@
         <div class="card mt-1">
             <div class="card-header"><h5>{{ question.question_text}}</h5></div>
             <div class="card-body">
+                
                 {% for choice in question.choice_set.all %}
-
-                {% for key, value in question_results.items %}
-                    {% if key == choice.id %}
-                        {% if value == 1 %}
-                        <div class="text-success">Correct answer: {{ choice.choice_text }}</div>
-                    {% elif value == 0 %} 
-                        <div>{{ choice.choice_text }}</div>
-                    {% else %}
-                        {% if choice.is_correct %}
-                        <div class="text-warning">Correct answer: {{ choice.choice_text }}</div>
+                    {% if choice.is_correct %}
+                        {% if choice.id in selected_choice_ids%}
+                       
+                            <div class="text-success">Correct answer: {{ choice.choice_text }}</div>
                         {% else %}
-                        <div class="text-warning">{{ choice.choice_text }}</div>
+                            <div class="text-warning">Correct answer: {{ choice.choice_text }}</div>
                         {% endif %}
-
-                      
+                    {% else %}
+                        {% if choice.id in selected_choice_ids%}
+                            <div class="text-danger">{{ choice.choice_text }}</div>
+                        {% else %}
+                            <div>{{ choice.choice_text }}</div>
+                        {% endif %}
                     {% endif %}
-
-
-                {% endif %}
-                 {% endfor %}            
-                 {% endfor %}
+                {% endfor %}
+               
+               
             </div>
         </div>
         {% endfor %}

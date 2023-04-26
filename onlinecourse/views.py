@@ -114,6 +114,7 @@ def submit(request, course_id):
     enrollment = get_object_or_404(Enrollment, user=user, course=course)
     # Create a submission object referring to the enrollment
     submission = Submission.objects.create(enrollment=enrollment)
+    """
     if request.method == 'POST':
         # Collect the selected choices from exam form
         for item in request.POST.items():
@@ -122,7 +123,10 @@ def submit(request, course_id):
             if item[0].startswith('choice_'):
                 choice = get_object_or_404(Choice, pk=int(item[1]))
                 submission.choices.add(choice)
-        submission.save()
+    """
+    choices = extract_answers(request)
+    submission.choices.set(choices)
+    submission.save()
    
     return HttpResponseRedirect(reverse(viewname='onlinecourse:show_exam_result', args=(course.id, submission.id)))
 
@@ -155,25 +159,10 @@ def show_exam_result(request, course_id, submission_id):
     
     # For each selected choice, check if it is a correct answer or not
     total_score = 0
-    question_results = {}
  
     for question in course.question_set.all():
         score_flag = True
-        #for choice in question.choice_set.filter(is_correct=True):
-        sub_choice = submission.choices.filter(question_id=question.id)
-        for choice in question.choice_set.all():
-            value = 0
-            exists = sub_choice.filter(id=choice.id).exists()
-            if choice.is_correct:
-                value = 1 if exists else -1
-            else:
-                value = -1 if exists else 0            
-                
-            if value == -1:
-                score_flag = False
-            question_results[choice.id] = value
-
-        if score_flag:
+        if question.is_get_score(selected_choice_ids):
             total_score += question.grade
    
     # Render the exam result template with the results
@@ -181,7 +170,7 @@ def show_exam_result(request, course_id, submission_id):
         'course': course,
         'submission': submission,
         'grade' : total_score,
-        'question_results': question_results,
+        'selected_choice_ids':selected_choice_ids
     })
 
 
