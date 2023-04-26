@@ -156,27 +156,7 @@ def show_exam_result(request, course_id, submission_id):
     # For each selected choice, check if it is a correct answer or not
     total_score = 0
     question_results = {}
-    """
-    for choice in submission.choices.all():
-        is_correct = choice.is_correct
-        if is_correct:
-#            question_results.append({'question': choice.question, 'choice_id': choice.id})
-            total_score += choice.question.grade
-    """
-    """
-    for question in course.question_set.all():
-        score_flag = True
-        for choice in question.choice_set.filter(is_correct=True):
-            sub_choices = submission.choices.filter(question_id = question.id)
-            if sub_choices.filter(id__in = choice.id) == None:
-                score_flag = False
-                break
-
-            if score_flag:
-                total_score += question.grade
-
-            #question_results[question_id](choice.id)
-    """
+ 
     for question in course.question_set.all():
         score_flag = True
         #for choice in question.choice_set.filter(is_correct=True):
@@ -195,22 +175,12 @@ def show_exam_result(request, course_id, submission_id):
 
         if score_flag:
             total_score += question.grade
-
-
-    # Calculate the total score
-   #max_score = submission.enrollment.exam.total_points
-    #percentage = (total_score / max_score) * 100
-    #passed = percentage >= submission.enrollment.exam.passing_percentage
-    
+   
     # Render the exam result template with the results
     return render(request, 'onlinecourse/exam_result_bootstrap.html', {
         'course': course,
         'submission': submission,
         'grade' : total_score,
-       # 'total_score': total_score,
-       # 'max_score': max_score,
-       # 'percentage': percentage,
-       # 'passed': passed,
         'question_results': question_results,
     })
 
